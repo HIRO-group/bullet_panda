@@ -5,19 +5,7 @@ from bullet_robot import BulletRobot
 
 import logging
 from robot_config import ROBOT_CONFIG
-
-try:
-    import rospkg
-
-    rospack = rospkg.RosPack()
-    rospack.list() 
-
-    # description_path = rospack.get_path('aml_grasp')+"/src/aml_grasp/models/sawyer/sawyer2_with_pisa_hand.urdf"
-    description_path = rospack.get_path('franka_panda_description')+"/robots/panda_arm.urdf"
-except Exception as e:
-    # print e
-    logging.warn("{}\nSpecify path to panda_arm.urdf file when using PandaArm instance.\n\n".format(e))
-    description_path = None
+from os.path import abspath
 
 
 class PandaArm(BulletRobot):
@@ -67,7 +55,7 @@ class PandaArm(BulletRobot):
 
     """
 
-    def __init__(self, robot_description = description_path, config = ROBOT_CONFIG, uid = None, *args, **kwargs):
+    def __init__(self, robot_description=None, config=ROBOT_CONFIG, uid=None, *args, **kwargs):
 
         """
         @param robot_description: path to description file (urdf, .bullet, etc.)
@@ -79,6 +67,9 @@ class PandaArm(BulletRobot):
         @type uid               : int
         """
         self._ready = False
+
+        if robot_description is None:
+            robot_description = abspath('../../assets') + '/panda_arm.urdf'
 
         self._joint_names = ['panda_joint%s' % (s,) for s in range(1, 8)]
 
@@ -276,6 +267,4 @@ if __name__ == '__main__':
 
     p = PandaArm()
     # pass
-
-
 
