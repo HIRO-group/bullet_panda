@@ -276,12 +276,20 @@ class PandaArm(BulletRobot):
             j_inv = pinv(j)
             self.exec_velocity_cmd(matmul(j_inv, vec))
 
+        self._bullet_robot.set_ctrl_mode()
+
 
 if __name__ == '__main__':
-
     p = PandaArm()
 
     time.sleep(5.0)
 
     ee_vel = [0, 0.1, 0, 0, 0, 0]
     p.apply_vel_vec(ee_vel, 4)
+
+    time.sleep(2.0)
+
+    ee_vel = [0, -0.1, 0, 0, 0, 0]
+    p.apply_vel_vec(ee_vel, 4)
+
+    time.sleep(2.0)
