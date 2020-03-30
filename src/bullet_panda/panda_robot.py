@@ -7,6 +7,9 @@ import logging
 from robot_config import ROBOT_CONFIG
 from os.path import abspath
 
+from numpy import matmul
+from numpy.linalg import pinv
+
 
 class PandaArm(BulletRobot):
 
@@ -217,12 +220,12 @@ class PandaArm(BulletRobot):
         state['position'] = joint_angles
         state['velocity'] = joint_velocities
         state['effort'] = joint_efforts
-        state['jacobian'] = self.jacobian(None)
-        state['inertia'] = self.inertia(None)
+        state['jacobian'] = self._bullet_robot.jacobian(None)
+        state['inertia'] = self._bullet_robot.inertia(None)
 
-        state['ee_point'], state['ee_ori'] = self.ee_pose()
+        state['ee_point'], state['ee_ori'] = self._bullet_robot.ee_pose()
 
-        state['ee_vel'], state['ee_omg'] = self.ee_velocity()
+        state['ee_vel'], state['ee_omg'] = self._bullet_robot.ee_velocity()
 
         return state
 
@@ -263,8 +266,22 @@ class PandaArm(BulletRobot):
         """
         return self._joint_names
 
+    def apply_vel_vec(self, vec, t):
+        now = time.time()
+
+        while True:
+            if time.time() - now > t:
+                break
+            j = self.state()['jacobian']
+            j_inv = pinv(j)
+            self.exec_velocity_cmd(matmul(j_inv, vec))
+
+
 if __name__ == '__main__':
 
     p = PandaArm()
-    # pass
 
+    time.sleep(5.0)
+
+    ee_vel = [0, 0.1, 0, 0, 0, 0]
+    p.apply_vel_vec(ee_vel, 4)
