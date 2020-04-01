@@ -70,6 +70,7 @@ class PandaArm(BulletRobot):
         @type uid               : int
         """
         self._ready = False
+        self.data = []
 
         if robot_description is None:
             robot_description = abspath('../../assets') + '/panda_arm.urdf'
@@ -266,10 +267,13 @@ class PandaArm(BulletRobot):
         """
         return self._joint_names
 
-    def apply_vel_vec(self, vec, t):
+    def apply_vel_vec(self, vec, t, log=False, **kwargs):
         now = time.time()
 
         while True:
+
+            if log:
+                self.data.append(self.state())
             if time.time() - now > t:
                 break
             j = self.state()['jacobian']
@@ -277,19 +281,5 @@ class PandaArm(BulletRobot):
             self.exec_velocity_cmd(matmul(j_inv, vec))
 
         self._bullet_robot.set_ctrl_mode()
-
-
-if __name__ == '__main__':
-    p = PandaArm()
-
-    time.sleep(5.0)
-
-    ee_vel = [0, 0.1, 0, 0, 0, 0]
-    p.apply_vel_vec(ee_vel, 4)
-
-    time.sleep(2.0)
-
-    ee_vel = [0, -0.1, 0, 0, 0, 0]
-    p.apply_vel_vec(ee_vel, 4)
-
-    time.sleep(2.0)
+        if log:
+            np.save(kwargs['datapath'], self.data)
