@@ -77,24 +77,24 @@ class PandaArm(BulletRobot):
 
         self._joint_names = ['panda_joint%s' % (s,) for s in range(1, 8)]
 
-        self._bullet_robot = BulletRobot(robot_description, uid = uid)  
+        self._bullet_robot = BulletRobot(robot_description, uid=uid)
 
         all_joint_dict = self._bullet_robot.get_joint_dict()
         self._joint_ids = [all_joint_dict[joint_name] for joint_name in self._joint_names]
 
-        self._tuck = [-0.017792060227770554 , -0.7601235411041661  , 0.019782607023391807 , -2.342050140544315 , 0.029840531355804868 , 1.5411935298621688 , 0.7534486589746342]
+        self._tuck = [-0.017792060227770554, -0.7601235411041661, 0.019782607023391807, -2.342050140544315,
+                      0.029840531355804868, 1.5411935298621688, 0.7534486589746342]
 
         self._untuck = self._tuck
 
         lower_limits = self._bullet_robot.get_joint_limits()['lower'][self._joint_ids]
         upper_limits = self._bullet_robot.get_joint_limits()['upper'][self._joint_ids]
 
-        self._jnt_limits = [{'lower': x[0], 'upper': x[1]} for x in zip(lower_limits,upper_limits)]
+        self._jnt_limits = [{'lower': x[0], 'upper': x[1]} for x in zip(lower_limits, upper_limits)]
 
         self.move_to_joint_position(self._tuck)
 
         self._ready = True
-
 
     def exec_position_cmd(self, cmd):
         """
@@ -128,14 +128,14 @@ class PandaArm(BulletRobot):
 
     def move_to_joint_pos_delta(self, cmd):
         """
-        Same as exec_position_cmd_delta. (Left here for maintaining structure of PandaArm class from panda_robot package)
+        Same as exec_position_cmd_delta.
+        (Left here for maintaining structure of PandaArm class from panda_robot package)
 
         @param cmd  : joint position delta values
         @type cmd   : [float] len: self._nu
 
         """
         self.exec_position_cmd_delta(cmd)
-
 
     def exec_velocity_cmd(self, cmd):
         """
@@ -156,7 +156,6 @@ class PandaArm(BulletRobot):
 
         """
         self._bullet_robot.set_joint_torques(cmd, self._joint_ids)
-
 
     def inverse_kinematics(self, position, orientation=None):
         """
@@ -230,14 +229,12 @@ class PandaArm(BulletRobot):
 
         return state
 
-
     def angles(self):
         """
         @return Current joint positions.
         @rtype: [float] * self._nq
         """
         return self._bullet_robot.angles()[self._joint_ids]
-
 
     def joint_limits(self):
         """
