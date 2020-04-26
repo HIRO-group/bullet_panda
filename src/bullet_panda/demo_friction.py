@@ -44,10 +44,16 @@ for n, params in trials.items():
         p.stepSimulation()
         time.sleep(1/240)
 
-        data[i].append((force_mag,
-                        p.getContactPoints()[0][-2],
-                        p.getContactPoints()[0][-4],
-                        p.getContactPoints()[0][-5]))
+        total_normal_force = 0
+        total_lateral_friction_force = [0, 0, 0]
+        pts = p.getContactPoints()
+        for pt in pts:
+            total_normal_force += pt[9]
+            total_lateral_friction_force[0] += pt[11][0] * pt[10] + pt[13][0] * pt[12]
+            total_lateral_friction_force[1] += pt[11][1] * pt[10] + pt[13][1] * pt[12]
+            total_lateral_friction_force[2] += pt[11][2] * pt[10] + pt[13][2] * pt[12]
+
+        data[i].append([force_mag, total_lateral_friction_force, total_normal_force])
         force_mag += 1
 
     p.resetBasePositionAndOrientation(cube_id, cube_start_pos, cube_start_orientation)
